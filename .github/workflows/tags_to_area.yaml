@@ -16,11 +16,11 @@ jobs:
         run: |
           echo "Analisando tags..."
 
-          mkdir -p areas
+          mkdir -p 00_Áreas
           CREATED=0
 
           grep -RIn "#[A-Za-z0-9_-]\+" . \
-            --exclude-dir={.git,node_modules,dist,vendor,.obsidian,areas} \
+            --exclude-dir={.git,node_modules,dist,vendor,.obsidian,00_Áreas} \
           | awk -F: '
               {
                 file=$1
@@ -59,6 +59,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add .
+          git add 00_Áreas/
           git commit -m "chore: criar áreas a partir de tags recorrentes"
           git push

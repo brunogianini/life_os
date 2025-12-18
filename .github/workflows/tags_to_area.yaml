@@ -1,0 +1,21 @@
+name: Workflow para transformar tags recorrentes em áreas
+
+on:
+    push:
+
+jobs:
+    analise:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout
+              uses: actions/checkout@v3
+            
+            - name: Listar tags recorrentes
+              run: |
+                echo "Tags encontradas:"
+                grep -Roh "#[A-Za-z0-9_-]\+" . \
+                --exclude-dir={.git,node_modules,dist,vendor} \
+                | sed 's/#//' \
+                | sort \
+                | uniq -c \
+                | sort -nr

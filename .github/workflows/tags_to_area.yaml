@@ -42,7 +42,7 @@ jobs:
               }
             ' \
           | while read -r tag; do
-              FILE="areas/$tag.md"
+              FILE="00_Áreas/$tag.md"
               if [ ! -f "$FILE" ]; then
                 echo "Criando área para tag '$tag'"
                 echo "# Área: $tag" > "$FILE"

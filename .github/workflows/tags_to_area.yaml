@@ -1,21 +1,65 @@
 name: Workflow para transformar tags recorrentes em áreas
 
 on:
-    push:
+  push:
 
 jobs:
-    analise:
-        runs-on: ubuntu-latest
-        steps:
-            - name: checkout
-              uses: actions/checkout@v3
-            
-            - name: Listar tags recorrentes
-              run: |
-                echo "Tags encontradas:"
-                grep -Roh "#[A-Za-z0-9_-]\+" . \
-                --exclude-dir={.git,node_modules,dist,vendor,.obsidian} \
-                | sed 's/#//' \
-                | sort \
-                | uniq -c \
-                | sort -nr
+  analise:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Listar tags recorrentes e criar áreas
+        run: |
+          echo "Analisando tags..."
+
+          mkdir -p areas
+
+          grep -RIn "#[A-Za-z0-9_-]\+" . \
+            --exclude-dir={.git,node_modules,dist,vendor,.obsidian,areas} \
+          | awk -F: '
+              {
+                file=$1
+                while (match($0, /#[A-Za-z0-9_-]+/)) {
+                  tag=substr($0, RSTART+1, RLENGTH-1)
+                  key=file ":" tag
+                  if (!seen[key]++) {
+                    count[tag]++
+                  }
+                  $0=substr($0, RSTART+RLENGTH)
+                }
+              }
+              END {
+                print "Tags encontradas:"
+                for (t in count) {
+                  printf "%5d %s\n", count[t], t
+                }
+                print "---"
+                for (t in count) {
+                  if (count[t] > 5) {
+                    print t
+                  }
+                }
+              }
+            ' \
+          | {
+              read -r line
+              echo "$line"
+              while read -r line; do
+                echo "$line"
+                if [[ "$line" == "---" ]]; then
+                  break
+                fi
+              done
+
+              while read -r tag; do
+                echo "Criando área para tag '$tag'"
+                FILE="areas/$tag.md"
+                if [ ! -f "$FILE" ]; then
+                  echo "# Área: $tag" > "$FILE"
+                  echo "" >> "$FILE"
+                  echo "Criada automaticamente pois a tag aparece em mais de 5 arquivos." >> "$FILE"
+                fi
+              done
+            }

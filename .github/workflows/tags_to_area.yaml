@@ -15,21 +15,7 @@ jobs:
                 echo "Tags encontradas:"
                 grep -Roh "#[A-Za-z0-9_-]\+" . \
                 --exclude-dir={.git,node_modules,dist,vendor,.obsidian} \
-                | awk -F: '
-                        {
-                        file=$1
-                        while (match($0, /#[A-Za-z0-9_-]+/)) {
-                            tag=substr($0, RSTART+1, RLENGTH-1)
-                            key=file ":" tag
-                            if (!seen[key]++) {
-                            count[tag]++
-                            }
-                            $0=substr($0, RSTART+RLENGTH)
-                        }
-                        }
-                        END {
-                        for (t in count)
-                            printf "%5d %s\n", count[t], t
-                        }
-                    ' \
-                    | sort -nr
+                | sed 's/#//' \
+                | sort \
+                | uniq -c \
+                | sort -nr

@@ -14,7 +14,7 @@ jobs:
               run: |
                 echo "Tags encontradas:"
                 grep -Roh "#[A-Za-z0-9_-]\+" . \
-                --exclude-dir={.git,node_modules,dist,vendor} \
+                --exclude-dir={.git,node_modules,dist,vendor,.obsidian} \
                 | sed 's/#//' \
                 | sort \
                 | uniq -c \

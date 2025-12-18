@@ -59,6 +59,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add areas/
+          git add .
           git commit -m "chore: criar áreas a partir de tags recorrentes"
           git push
